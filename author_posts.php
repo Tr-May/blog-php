@@ -10,10 +10,10 @@ if (isset($_SESSION["user_id"])) {
   $user_id = "";
 }
 
-if (isset($_GET["category"])) {
-  $category = $_GET["category"];
+if (isset($_GET["author"])) {
+  $author = $_GET["author"];
 } else {
-  $category = "";
+  $author = "";
 }
 
 include "components/like_post.php";
@@ -25,54 +25,48 @@ include "components/like_post.php";
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Category</title>
+   <title>Author Posts</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 
-   <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
 
 </head>
 <body>
    
-<!-- header section starts  -->
 <?php include "components/user_header.php"; ?>
-<!-- header section ends -->
 
 <section class="posts-container">
-
-   <h1 class="heading">post categories</h1>
-
    <div class="box-container">
 
-      <?php
-      $select_posts = $conn->prepare(
-        "SELECT * FROM `posts` WHERE category = ? and status = ?"
-      );
-      $select_posts->execute([$category, "active"]);
-      if ($select_posts->rowCount() > 0) {
-        while ($fetch_posts = $select_posts->fetch(PDO::FETCH_ASSOC)) {
+   <?php
+   $select_posts = $conn->prepare(
+     "SELECT * FROM `posts` WHERE name = ? and status = ?"
+   );
+   $select_posts->execute([$author, "active"]);
+   if ($select_posts->rowCount() > 0) {
+     while ($fetch_posts = $select_posts->fetch(PDO::FETCH_ASSOC)) {
 
-          $post_id = $fetch_posts["id"];
+       $post_id = $fetch_posts["id"];
 
-          $count_post_comments = $conn->prepare(
-            "SELECT * FROM `comments` WHERE post_id = ?"
-          );
-          $count_post_comments->execute([$post_id]);
-          $total_post_comments = $count_post_comments->rowCount();
+       $count_post_comments = $conn->prepare(
+         "SELECT * FROM `comments` WHERE post_id = ?"
+       );
+       $count_post_comments->execute([$post_id]);
+       $total_post_comments = $count_post_comments->rowCount();
 
-          $count_post_likes = $conn->prepare(
-            "SELECT * FROM `likes` WHERE post_id = ?"
-          );
-          $count_post_likes->execute([$post_id]);
-          $total_post_likes = $count_post_likes->rowCount();
+       $count_post_likes = $conn->prepare(
+         "SELECT * FROM `likes` WHERE post_id = ?"
+       );
+       $count_post_likes->execute([$post_id]);
+       $total_post_likes = $count_post_likes->rowCount();
 
-          $confirm_likes = $conn->prepare(
-            "SELECT * FROM `likes` WHERE user_id = ? AND post_id = ?"
-          );
-          $confirm_likes->execute([$user_id, $post_id]);
-          ?>
+       $confirm_likes = $conn->prepare(
+         "SELECT * FROM `likes` WHERE user_id = ? AND post_id = ?"
+       );
+       $confirm_likes->execute([$user_id, $post_id]);
+       ?>
       <form class="box" method="post">
          <input type="hidden" name="post_id" value="<?= $post_id ?>">
          <input type="hidden" name="admin_id" value="<?= $fetch_posts[
@@ -109,23 +103,17 @@ include "components/like_post.php";
       
       </form>
       <?php
-        }
-      } else {
-        echo '<p class="empty">no posts found for this category!</p>';
-      }
-      ?>
+     }
+   } else {
+     echo '<p class="empty">no posts found for this author!</p>';
+   }
+   ?>
+
    </div>
-
 </section>
-
-
-
-
-
 
 <?php include "components/footer.php"; ?>
 
-<!-- custom js file link  -->
 <script src="js/script.js"></script>
 
 </body>
